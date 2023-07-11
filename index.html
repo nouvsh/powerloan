@@ -52,6 +52,7 @@
 						</tr>
 					</thead>
 					<tbody>
+
 						<tr v-for="(row, index) in loan_period" :key="index">
 							<th scope="row">{{ row }}</th>
 							<td>{{ Monthly(index) }}</td>
@@ -59,6 +60,7 @@
 							<td>${{ Monthly_Payment(row) }}</td>
 							<td>${{ Payoff_Amount(row) }}</td>
 						</tr>
+                        
 					</tbody>
 				</table>
 			</div>
@@ -84,29 +86,29 @@
 					},                
 					Principal: function() {
 						
-						return this.ROUND_UP(this.loan_amount / this.loan_period);
+						return (this.loan_amount / this.loan_period).toFixed(1);
 					},
 					First_Payment: function() {
 						
 						const Number_of_Days = moment(this.payment_date).diff(this.loan_date,'days');
 						
-						return this.ROUND_UP(this.loan_amount * (1 + this.interest_rate * Number_of_Days / 30 * this.loan_period / 100) / this.loan_period);
+						return (this.loan_amount * (1 + this.interest_rate * Number_of_Days / 30 * this.loan_period / 100) / this.loan_period);
 					},
 					Next_Payment: function() {
 						
-						return this.ROUND_UP(this.loan_amount * (1 + this.interest_rate * this.loan_period / 100) / this.loan_period);
+						return (this.loan_amount * (1 + this.interest_rate * this.loan_period / 100) / this.loan_period);
 					},
 					Last_Payment: function() {
 						
-						return this.ROUND_UP(this.Next_Payment() - (Math.round(this.Next_Payment()) - this.Next_Payment()) * (this.loan_period - 1) - (Math.round(this.First_Payment()) - this.First_Payment()));
+						return (this.Next_Payment() - (this.ROUND_UP(this.Next_Payment()) - this.Next_Payment()) * (this.loan_period - 2) - (this.ROUND_UP(this.First_Payment()) - this.First_Payment())).toFixed(1);
 					},
 					Monthly_Payment: function(row) {
 						
 						if(row == 1)
-							return this.First_Payment();
+							return this.ROUND_UP(this.First_Payment());
 						
 						else if(row < this.loan_period)
-							return this.Next_Payment();
+							return this.ROUND_UP(this.Next_Payment());
 						
 						else
 							return this.Last_Payment();
@@ -140,7 +142,7 @@
 					},
 					ROUND_UP: function(num) {
 						
-						return Math.round(num);
+						return Math.ceil(num);
 					},
 					
 				}
